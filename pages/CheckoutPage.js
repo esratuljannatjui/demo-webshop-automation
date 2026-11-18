@@ -10,6 +10,7 @@ class CheckoutPage {
     this.phone = page.locator('#BillingNewAddress_PhoneNumber');
     this.billingContinue = page.locator('#billing-buttons-container .button-1');
     
+    this.shippingAddressContinue = page.locator('#shipping-buttons-container .button-1');
     this.shippingMethodContinue = page.locator('#shipping-method-buttons-container .button-1');
     this.paymentMethodContinue = page.locator('#payment-method-buttons-container .button-1');
     this.paymentInfoContinue = page.locator('#payment-info-buttons-container .button-1');
@@ -17,7 +18,7 @@ class CheckoutPage {
     
     this.successTitle = page.locator('.order-completed .title');
     this.orderNumber = page.locator('.order-completed .details li').first();
-    this.detailsLink = page.locator('.order-completed .details-link a');
+    this.detailsLink = page.locator('.order-completed a[href*="orderdetails"]');
     this.orderDetailsPage = page.locator('.order-details-page');
   }
 
@@ -33,6 +34,7 @@ class CheckoutPage {
 
   async completeCheckout(addr) {
     await this.fillBilling(addr);
+    await this.shippingAddressContinue.click();
     await this.shippingMethodContinue.click();
     await this.paymentMethodContinue.click();
     await this.paymentInfoContinue.click();
