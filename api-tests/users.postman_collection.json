@@ -1,0 +1,132 @@
+{
+  "info": {
+    "name": "Users API Tests",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "GET All Users",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status code is 200\", function () {",
+              "  pm.response.to.have.status(200);",
+              "});",
+              "",
+              "const users = pm.response.json();",
+              "",
+              "pm.test(\"Response is a non-empty array\", function () {",
+              "  pm.expect(users).to.be.an(\"array\").that.is.not.empty;",
+              "});",
+              "",
+              "pm.test(\"Each user has id, name and email\", function () {",
+              "  users.forEach(function (u) {",
+              "    pm.expect(u).to.have.property(\"id\");",
+              "    pm.expect(u).to.have.property(\"name\");",
+              "    pm.expect(u).to.have.property(\"email\");",
+              "  });",
+              "});",
+              "",
+              "const selected = users[Math.floor(Math.random() * users.length)];",
+              "pm.collectionVariables.set(\"userId\", selected.id);",
+              "pm.collectionVariables.set(\"userObj\", JSON.stringify(selected));"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "User-Agent", "value": "PostmanRuntime/7.0" }
+        ],
+        "url": {
+          "raw": "https://jsonplaceholder.typicode.com/users",
+          "protocol": "https",
+          "host": ["jsonplaceholder", "typicode", "com"],
+          "path": ["users"]
+        }
+      }
+    },
+    {
+      "name": "PUT Update User",
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const stamp = Date.now();",
+              "const user = JSON.parse(pm.collectionVariables.get(\"userObj\"));",
+              "",
+              "const updatedName = \"Updated User \" + stamp;",
+              "const updatedEmail = \"updated\" + stamp + \"@example.com\";",
+              "const updatedCompany = \"Updated Company \" + stamp;",
+              "",
+              "user.name = updatedName;",
+              "user.email = updatedEmail;",
+              "user.company.name = updatedCompany;",
+              "",
+              "pm.collectionVariables.set(\"updatedName\", updatedName);",
+              "pm.collectionVariables.set(\"updatedEmail\", updatedEmail);",
+              "pm.collectionVariables.set(\"updatedCompany\", updatedCompany);",
+              "pm.collectionVariables.set(\"putBody\", JSON.stringify(user));"
+            ]
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status code is 200\", function () {",
+              "  pm.response.to.have.status(200);",
+              "});",
+              "",
+              "const res = pm.response.json();",
+              "",
+              "pm.test(\"Returned ID matches stored ID\", function () {",
+              "  pm.expect(String(res.id)).to.eql(String(pm.collectionVariables.get(\"userId\")));",
+              "});",
+              "",
+              "pm.test(\"Phone is not empty\", function () {",
+              "  pm.expect(res.phone).to.be.a(\"string\").and.not.empty;",
+              "});",
+              "",
+              "pm.test(\"Returned name matches updated name\", function () {",
+              "  pm.expect(res.name).to.eql(pm.collectionVariables.get(\"updatedName\"));",
+              "});",
+              "",
+              "pm.test(\"Returned email matches updated email\", function () {",
+              "  pm.expect(res.email).to.eql(pm.collectionVariables.get(\"updatedEmail\"));",
+              "});",
+              "",
+              "pm.test(\"Returned company name matches updated value\", function () {",
+              "  pm.expect(res.company.name).to.eql(pm.collectionVariables.get(\"updatedCompany\"));",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "PUT",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "User-Agent", "value": "PostmanRuntime/7.0" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{{putBody}}"
+        },
+        "url": {
+          "raw": "https://jsonplaceholder.typicode.com/users/{{userId}}",
+          "protocol": "https",
+          "host": ["jsonplaceholder", "typicode", "com"],
+          "path": ["users", "{{userId}}"]
+        }
+      }
+    }
+  ]
+}
